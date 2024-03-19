@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  looping-louie-admin:
+    container_name: looping-louie-admin
+    build: ../
+    image: louie-admin:${GIT_COMMIT_HASH}
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      KAFKA_PORT: 9092
+      KAFKA_SERVER: looping-louie-kafka
+      DB_SERVER: looping-louie-database
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - louie-network
+
+  looping-louie-database:
+    container_name: looping-louie-database
+    image: mongo:4.4.18-rc0-focal # Newer versions sadly not run on our raspberry :/
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: sa
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-looping-louie:/data/db
+    networks:
+      - louie-network
+
+  mongo-express:
+    container_name: looping-louie-mongo-express
+    image: mongo-express
+    ports:
+      - "8889:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://sa:${DB_PASSWORD}@looping-louie-database:27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_BASICAUTH_USERNAME: sa
+      ME_CONFIG_BASICAUTH_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - looping-louie-database
+    networks:
+      - louie-network
+
+volumes:
+  db-looping-louie:
+
+networks:
+  louie-network:
+    name: ${NETWORK_NAME}
+    external: true

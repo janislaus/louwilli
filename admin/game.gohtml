@@ -1,0 +1,98 @@
+<!-- game table -->
+{{define "games-table-content"}}
+    <div class="p-2 flex-fill bd-highlight">
+        <div class="p-2 bd-highlight">
+            <div class="row justify-content-center mb-4">
+                <div class="col-1">
+                    <h4>Game</h4>
+                </div>
+            </div>
+            <form>
+                <table id="gameTable" class="table table-striped table-bordered table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">Remove</th>
+                        <th scope="col">Id</th>
+                        <th scope="col">Ki Name</th>
+                        <th scope="col">Ki Coins</th>
+                        <th scope="col">Player 1</th>
+                        <th scope="col">Player 1 Coins</th>
+                        <th scope="col">Player 2</th>
+                        <th scope="col">Player 2 Coins</th>
+                        <th scope="col">Player 3</th>
+                        <th scope="col">Player 3 Coins</th>
+                        <th scope="col">Game-State</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{range .GameEntries}}
+                        <tr>
+                            <td>
+                                <button id="{{.Id}}" class="btn btn-secondary" hx-put="/game"
+                                        hx-target="#games-content">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="bi bi-trash" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td><input class="form-control" type="text" readonly value="{{.Id}}"></td>
+                            <td>{{.KiName}}</td>
+                            <td>
+                                <div id="ki-coins">
+                                    <p>{{.KiCoins}}</p>
+                                </div>
+                            </td>
+                            <td>{{.Player1}}</td>
+                            <td>
+                                <div id="player1-coins">
+                                    <p>{{.Player1Coins}}</p>
+                                </div>
+                            </td>
+                            <td>{{.Player2}}</td>
+                            <td>
+                                <div id="player2-coins">
+                                    <p>{{.Player2Coins}}</p>
+                                </div>
+                            </td>
+                            <td>{{.Player3}}</td>
+                            <td>
+                                <div id="player3-coins">
+                                    <p>{{.Player3Coins}}</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div id="game-state">
+                                    <p
+                                            {{ if eq .State "announced" }} class="state-announced" {{ end }}
+                                            {{ if eq .State "ready" }} class="state-ready" {{ end }}
+                                            {{ if eq .State "active" }} class="state-active" {{ end }}
+                                            {{ if eq .State "finished" }} class="state-finished" {{ end }}
+                                    >!!!! {{.State}} !!!!</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {{end}}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+        <div class="p-2 bd-highlight">
+            <div hx-target="#games-content">
+                <div id="game-start-button">
+                    <button class="btn btn-secondary"
+                            hx-post="/game">
+                        Create game with active users
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
+
+{{define "games-table"}}
+    <div class="d-flex align-content-center flex-wrap" id="games-content">
+        {{ template "games-table-content" . }}
+    </div>
+{{end}}

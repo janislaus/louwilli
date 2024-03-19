@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Looping-Louie-Administration</title>
+    <link href="static/bootstrap.min.css" rel="stylesheet"/>
+    <script type="text/javascript" src="static/jquery.min.js"></script>
+    <script type="text/javascript" src="static/functions.js"></script>
+    <script type="text/javascript" src="static/htmx.min.js"></script>
+    <script type="text/javascript" src="static/response-target.js"></script>
+    <script type="text/javascript" src="static/ws.js"></script>
+
+    <style>
+
+        :root {
+            --main-bg-color: #A9C23F;
+        }
+
+        input {
+            background-color: rgb(169, 194, 63, .3) !important;
+            border-color: rgb(169, 194, 63, .3) !important;
+        }
+
+        button {
+            background-color: var(--main-bg-color) !important;
+            border-color: var(--main-bg-color) !important;
+        }
+
+        .active a {
+            background-color: var(--main-bg-color) !important;
+            border-color: var(--main-bg-color) !important;
+            color: white !important;
+        }
+
+        a:focus a:hover {
+            color: white !important;
+        }
+
+        .page-link {
+            color: var(--main-bg-color);
+            border-color: var(--main-bg-color);
+        }
+
+        .state-announced {
+            color: var(--main-bg-color);
+            font-weight: bold;
+        }
+
+        .state-ready {
+            color: var(--main-bg-color);
+            animation: blink 500ms linear infinite;
+            font-weight: bold;
+        }
+
+        .state-active {
+            color: var(--main-bg-color);
+            animation: blink 1000ms linear infinite;
+            font-weight: bold;
+        }
+
+        .state-finished {
+            color: var(--main-bg-color);
+            font-weight: bold;
+        }
+
+        @keyframes blink {
+            25% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 0;
+            }
+            75% {
+                opacity: 0.5;
+            }
+        }
+
+        .htmx-settling tr.waiting td {
+            background: lightcoral;
+        }
+
+        .htmx-settling tr.active td {
+            background: darkseagreen;
+        }
+
+        tr td {
+            transition: all 1.2s;
+        }
+
+        select option[value="0"] {
+            background-color: white;
+        }
+
+        select option[value="1"] {
+            background-color: rgb(247, 219, 0);
+        }
+
+        select option[value="2"] {
+            background-color: rgb(231, 79, 178);
+        }
+
+        select option[value="3"] {
+            background-color: rgb(217, 66, 60);
+        }
+    </style>
+</head>
+<body>
+
+<div hx-ext="ws" ws-connect="/ws">
+    <div style="position: fixed; margin: 10px" id="confirm-change-side"></div>
+    {{ template "games-table" . }}
+    <div hx-ext="response-targets">
+        <form>
+            <div id="user-table" class="container-fluid ">
+                {{ template "users-table" . }}
+            </div>
+        </form>
+    </div>
+</div>
+
+
+</body>
+<script type="text/javascript" src="static/user.js"></script>
+</html>

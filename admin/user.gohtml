@@ -1,0 +1,129 @@
+<!-- user table -->
+{{define "users-table-content"}}
+    {{ $templateContent := . }}
+    {{if not .UserEntries}}
+        <tr>
+            <td>Nothing to show</td>
+            <td>Nothing to show</td>
+            <td>Nothing to show</td>
+            <td>Nothing to show</td>
+            <td>Nothing to show</td>
+            <td>Nothing to show</td>
+            <td>Nothing to show</td>
+            <td>Nothing to show</td>
+        </tr>
+    {{end}}
+    {{range .UserEntries}}
+        <tr>
+            <td><input class="form-control" type="text" readonly name='id' value={{.Id}}></td>
+            <td><input class="form-control" type="text" readonly value={{.DisplayName}}></td>
+            <td><input class="form-control" type="text" readonly value={{.Email}}></td>
+            <td><input class="form-control" type="text" readonly value={{if .LastTimePlayed}}{{.LastTimePlayed}}{{end}}>
+            </td>
+            <td><input class="form-control" type="text" readonly value={{.RegisteredTimestamp}}></td>
+            <td><input class="form-control" type="text" readonly value={{.PlayedGames}}></td>
+            <td>
+                <select name="position" class="form-control" id="position"
+                        hx-put="/user/position" hx-params="not state" hx-target="#user-table"
+                        {{if eq .Pos "1"}} style="background-color: rgb(247, 219, 0)" {{end}}
+                        {{if eq .Pos "2"}} style="background-color: rgb(231, 79, 178)" {{end}}
+                        {{if eq .Pos "3"}} style="background-color:rgb(217, 66, 60)" {{end}}
+                >
+                    <option value="1" {{if eq .Pos "1"}} selected {{end}}>1</option>
+                    <option value="2" {{if eq .Pos "2"}} selected {{end}}>2</option>
+                    <option value="3" {{if eq .Pos "3"}} selected {{end}}>3</option>
+                </select>
+            </td>
+            <td>
+                <select name="state" class="form-control" id="state"
+                        hx-put="/user/state" hx-params="not position" hx-target="#user-table"
+                        {{if and (eq $templateContent.ActiveUsersCount 3) (eq .State "waiting")}}
+                            style="pointer-events: none; background: #ced4da;" {{end}}
+                >
+                    <option value="active" {{if eq .State "active"}} selected {{end}}>active</option>
+                    <option value="waiting" {{if eq .State "waiting"}} selected {{end}}>waiting</option>
+                </select>
+            </td>
+        </tr>
+    {{end}}
+{{end}}
+
+{{define "users-table"}}
+    <div class="row mb-4">
+    </div>
+    <div class="row justify-content-center mb-4">
+        <div class="col-1">
+            <h4>Users</h4>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th scope="col" class="text-center">Id</th>
+                <th scope="col" class="text-center">Name <input id="name-filter" style="margin-top: 10px"
+                                                                name="name-filter" type="search"
+                                                                class="form-control"
+                                                                hx-post="/user/filter"
+                                                                hx-params="not position,state,id"
+                                                                hx-trigger="input changed delay:500ms, name-filter"
+                                                                hx-target="#user-table" value="{{.NameFilter}}"
+                                                                hx-on::afterSwap="htmx.find('#name-filter').focus()"
+                    ></th>
+                <th scope="col" class="text-center">Email</th>
+                <th scope="col" class="text-center">Last time played</th>
+                <th scope="col" class="text-center">Registration date</th>
+                <th scope="col" class="text-center">How often played</th>
+                <th scope="col" class="text-center">
+                    <div class="row">
+                        <div class="col text-center">Position</div>
+                    </div>
+                    <div style="margin-top: 10px" class="row">
+                        <div class="col text-center">
+                            <button class="btn btn-secondary"
+                                    hx-put="/user/position/shuffle"
+                                    hx-target="#user-table"
+                                    title="random positions for active users">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512">
+                                    <path fill="#eff1f5"
+                                          d="M403.8 34.4c12-5 25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V160H352c-10.1 0-19.6 4.7-25.6 12.8L284 229.3 244 176l31.2-41.6C293.3 110.2 321.8 96 352 96h32V64c0-12.9 7.8-24.6 19.8-29.6zM164 282.7L204 336l-31.2 41.6C154.7 401.8 126.2 416 96 416H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c10.1 0 19.6-4.7 25.6-12.8L164 282.7zm274.6 188c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V416H352c-30.2 0-58.7-14.2-76.8-38.4L121.6 172.8c-6-8.1-15.5-12.8-25.6-12.8H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c30.2 0 58.7 14.2 76.8 38.4L326.4 339.2c6 8.1 15.5 12.8 25.6 12.8h32V320c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th scope="col">
+                    <div class="row">
+                        <div class="col text-center">Waiting/Active</div>
+                    </div>
+                    <div style="margin-top: 10px" class="row">
+                        <div class="col text-center">
+                            <button class="btn btn-secondary"
+                                    hx-put="/user/wait"
+                                    hx-target="#user-table"
+                                    title="set all users to waiting">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-cup-hot" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M.5 6a.5.5 0 0 0-.488.608l1.652 7.434A2.5 2.5 0 0 0 4.104 16h5.792a2.5 2.5 0 0 0 2.44-1.958l.131-.59a3 3 0 0 0 1.3-5.854l.221-.99A.5.5 0 0 0 13.5 6zM13 12.5a2.01 2.01 0 0 1-.316-.025l.867-3.898A2.001 2.001 0 0 1 13 12.5M2.64 13.825 1.123 7h11.754l-1.517 6.825A1.5 1.5 0 0 1 9.896 15H4.104a1.5 1.5 0 0 1-1.464-1.175Z"/>
+                                    <path d="m4.4.8-.003.004-.014.019a4.167 4.167 0 0 0-.204.31 2.327 2.327 0 0 0-.141.267c-.026.06-.034.092-.037.103v.004a.593.593 0 0 0 .091.248c.075.133.178.272.308.445l.01.012c.118.158.26.347.37.543.112.2.22.455.22.745 0 .188-.065.368-.119.494a3.31 3.31 0 0 1-.202.388 5.444 5.444 0 0 1-.253.382l-.018.025-.005.008-.002.002A.5.5 0 0 1 3.6 4.2l.003-.004.014-.019a4.149 4.149 0 0 0 .204-.31 2.06 2.06 0 0 0 .141-.267c.026-.06.034-.092.037-.103a.593.593 0 0 0-.09-.252A4.334 4.334 0 0 0 3.6 2.8l-.01-.012a5.099 5.099 0 0 1-.37-.543A1.53 1.53 0 0 1 3 1.5c0-.188.065-.368.119-.494.059-.138.134-.274.202-.388a5.446 5.446 0 0 1 .253-.382l.025-.035A.5.5 0 0 1 4.4.8m3 0-.003.004-.014.019a4.167 4.167 0 0 0-.204.31 2.327 2.327 0 0 0-.141.267c-.026.06-.034.092-.037.103v.004a.593.593 0 0 0 .091.248c.075.133.178.272.308.445l.01.012c.118.158.26.347.37.543.112.2.22.455.22.745 0 .188-.065.368-.119.494a3.31 3.31 0 0 1-.202.388 5.444 5.444 0 0 1-.253.382l-.018.025-.005.008-.002.002A.5.5 0 0 1 6.6 4.2l.003-.004.014-.019a4.149 4.149 0 0 0 .204-.31 2.06 2.06 0 0 0 .141-.267c.026-.06.034-.092.037-.103a.593.593 0 0 0-.09-.252A4.334 4.334 0 0 0 6.6 2.8l-.01-.012a5.099 5.099 0 0 1-.37-.543A1.53 1.53 0 0 1 6 1.5c0-.188.065-.368.119-.494.059-.138.134-.274.202-.388a5.446 5.446 0 0 1 .253-.382l.025-.035A.5.5 0 0 1 7.4.8m3 0-.003.004-.014.019a4.077 4.077 0 0 0-.204.31 2.337 2.337 0 0 0-.141.267c-.026.06-.034.092-.037.103v.004a.593.593 0 0 0 .091.248c.075.133.178.272.308.445l.01.012c.118.158.26.347.37.543.112.2.22.455.22.745 0 .188-.065.368-.119.494a3.198 3.198 0 0 1-.202.388 5.385 5.385 0 0 1-.252.382l-.019.025-.005.008-.002.002A.5.5 0 0 1 9.6 4.2l.003-.004.014-.019a4.149 4.149 0 0 0 .204-.31 2.06 2.06 0 0 0 .141-.267c.026-.06.034-.092.037-.103a.593.593 0 0 0-.09-.252A4.334 4.334 0 0 0 9.6 2.8l-.01-.012a5.099 5.099 0 0 1-.37-.543A1.53 1.53 0 0 1 9 1.5c0-.188.065-.368.119-.494.059-.138.134-.274.202-.388a5.446 5.446 0 0 1 .253-.382l.025-.035A.5.5 0 0 1 10.4.8"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {{ template "users-table-content" . }}
+            </tbody>
+        </table>
+    </div>
+    <div class="row justify-content-center mb-4">
+        <div class="col-1">
+            {{ template "paging" . }}
+        </div>
+    </div>
+{{end}}
+
+

@@ -1,0 +1,14 @@
+{{define "paging"}}
+    <nav>
+        <ul class="pagination">
+            {{range .Paging.Pages}}
+                <li class="page-item {{if eq .Active true }} active alert-success {{end}}"><a
+                            id="pageNumber-{{.Number}}"
+                            class="page-link alert-success"
+                            hx-target="#user-table"
+                            hx-get="/user/{{.Number}}">{{.Number}}</a>
+                </li>
+            {{end}}
+        </ul>
+    </nav>
+{{end}}
