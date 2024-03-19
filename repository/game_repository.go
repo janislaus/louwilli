@@ -49,6 +49,17 @@ func (config *GameRepo) CreateGame(gameMembers []RegisteredUser) (*primitive.Obj
 
 	ctx := context.Background()
 
+	existingGame := config.collection.FindOne(ctx, bson.D{})
+
+	if !errors.Is(existingGame.Err(), mongo.ErrNoDocuments) {
+		var result GameEntity
+		err := existingGame.Decode(&result)
+		if err != nil {
+			return nil, err
+		}
+		config.RemoveGame(result.Id.String())
+	}
+
 	var game = GameEntity{
 		Id:       primitive.NewObjectID(),
 		KiName:   KiName,
