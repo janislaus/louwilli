@@ -52,7 +52,12 @@ func (config *GameRepo) CreateGame(gameMembers []RegisteredUser) (*primitive.Obj
 	existingGame := config.collection.FindOne(ctx, bson.D{})
 
 	if !errors.Is(existingGame.Err(), mongo.ErrNoDocuments) {
-		return nil, nil
+		var result GameEntity
+		err := existingGame.Decode(&result)
+		if err != nil {
+			return nil, err
+		}
+		config.RemoveGame(result.Id.String())
 	}
 
 	var game = GameEntity{
